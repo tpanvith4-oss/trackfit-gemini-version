@@ -36,6 +36,8 @@
   },
   "dependencies": {
     "lucide-react": "^1.57.0",
-    "recharts": "^3.10.1"
+    "recharts": "^3.10.1",
+    "three": "^0.187.0",
+    "ws": "^8.23.0"
   }
 }

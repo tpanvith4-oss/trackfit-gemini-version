@@ -77,7 +77,8 @@ export function createApp() {
   app.get('/api/health', sendOk);
 
   app.use(morgan(isProduction ? 'combined' : 'dev'));
-  app.use(express.json({ limit: '100kb' }));
+  app.use('/api/food/transcribe', express.json({ limit: '12mb' }));
+  app.use(express.json({ limit: '256kb' }));
 
   return app;
 }

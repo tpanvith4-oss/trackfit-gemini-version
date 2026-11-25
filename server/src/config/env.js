@@ -44,10 +44,10 @@ export const env = Object.freeze({
   corsOrigins: parseList(process.env.CORS_ORIGINS),
   jwtSecret: resolveJwtSecret(),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN?.trim() || '30d',
-  // Optional: without a key the API still runs and only the AI meal estimator is unavailable.
   geminiApiKey: process.env.GEMINI_API_KEY?.trim() || null,
-  // gemini-2.5-flash is closed to API keys created after its deprecation; older keys can still opt into it.
-  geminiModel: process.env.GEMINI_MODEL?.trim() || 'gemini-3.8-flash',
+  geminiModel: process.env.GEMINI_MODEL?.trim() || 'gemini-4-hydrogen',
+  transcribeModel: process.env.GEMINI_TRANSCRIBE_MODEL?.trim() || 'gemini-3.5-transcribe',
+  liveModel: process.env.GEMINI_LIVE_MODEL?.trim() || 'gemini-3.8-live',
   // Optional OpenAI-compatible fallback (NVIDIA NIM). Used when Gemini is unset or the Gemini call fails.
   nvidiaApiKey: process.env.NVIDIA_API_KEY?.trim() || null,
   nvidiaModel: process.env.NVIDIA_MODEL?.trim() || 'nvidia/llama-3.1-nemotron-70b-instruct',

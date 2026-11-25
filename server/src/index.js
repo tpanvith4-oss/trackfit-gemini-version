@@ -1,5 +1,6 @@
 import { createApp, mountApiRoutes } from './app.js';
 import { env } from './config/env.js';
+import { attachLiveCoachWebSocket } from './services/liveCoach.service.js';
 
 const SHUTDOWN_TIMEOUT_MS = 10_000;
 const PORT = Number.parseInt(process.env.PORT ?? '', 10) || env.port || 3000;
@@ -18,6 +19,8 @@ const server = app.listen(PORT, HOST, () => {
     )
     .catch((err) => console.error('[db] Init error:', err));
 });
+
+attachLiveCoachWebSocket(server);
 
 let shuttingDown = false;
 const shutdown = (signal) => {
