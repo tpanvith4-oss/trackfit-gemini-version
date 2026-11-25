@@ -1,0 +1,85 @@
+name: Build iOS IPA
+
+on:
+  workflow_dispatch: # Allows you to trigger the build manually from GitHub
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # .env / .env.ios are gitignored. Without this, Vite falls back to
+      # http://localhost:4000 and the IPA cannot reach the hosted API on device
+      # (and iOS ATS blocks cleartext HTTP).
+      - name: Install Dependencies & Build Web (iOS)
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || 'https://trackfit-o6zn.onrender.com' }}
+        run: |
+          npm config set legacy-peer-deps true
+          npm install --legacy-peer-deps
+          printf 'VITE_API_BASE_URL=%s\n' "$VITE_API_BASE_URL" > client/.env.ios
+          npm --workspace=client run build:ios
+
+      - name: Sync Capacitor iOS
+        working-directory: ./client
+        run: |
+          rm -rf ios
+          npx cap add ios
+          npx cap sync ios
+
+      - name: Build iOS App (No Code Signing)
+        working-directory: ./client/ios/App
+        run: |
+          if [ -d "App.xcworkspace" ]; then
+            xcodebuild -workspace App.xcworkspace \
+              -scheme App \
+              -configuration Release \
+              -sdk iphoneos \
+              -derivedDataPath build \
+              CODE_SIGN_IDENTITY="" \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGNING_ALLOWED=NO \
+              build
+          else
+            xcodebuild -project App.xcodeproj \
+              -scheme App \
+              -configuration Release \
+              -sdk iphoneos \
+              -derivedDataPath build \
+              CODE_SIGN_IDENTITY="" \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGNING_ALLOWED=NO \
+              build
+          fi
+
+      - name: Package to IPA
+        working-directory: ./client/ios/App
+        run: |
+          echo "Locating App.app..."
+          # Find the App.app directory inside the build folder
+          APP_PATH=$(find build -name "App.app" -type d | head -n 1)
+
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: App.app not found in the build directory."
+            exit 1
+          fi
+
+          echo "Found App.app at: $APP_PATH"
+
+          mkdir -p Payload
+          # Use cp -R instead of mv to avoid cross-device link errors, then zip
+          cp -R "$APP_PATH" Payload/App.app
+          zip -r TrackFit.ipa Payload
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TrackFit-iOS
+          path: client/ios/App/TrackFit.ipa

@@ -1,0 +1,43 @@
+{
+  "name": "@trackfit/client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.18.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:android": "vite build --mode android",
+    "build:ios": "vite build --mode ios",
+    "preview": "vite preview",
+    "android:add": "npm run build:android && cap add android && npm run android:assets",
+    "android:sync": "npm run build:android && cap sync android && npm run android:assets",
+    "android:assets": "node scripts/generate-alarm-sound.mjs",
+    "android:open": "cap open android",
+    "ios:add": "npm run build:ios && cap add ios",
+    "ios:sync": "npm run build:ios && cap sync ios",
+    "ios:open": "cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/haptics": "^7.0.5",
+    "@capacitor/ios": "^7.0.0",
+    "@capacitor/local-notifications": "^7.0.7",
+    "@capacitor/preferences": "^7.0.0",
+    "lucide-react": "^1.58.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-is": "^19.3.1",
+    "recharts": "^3.10.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^4.7.0",
+    "tailwindcss": "^4.3.3",
+    "vite": "^6.4.4"
+  }
+}

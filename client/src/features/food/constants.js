@@ -1,0 +1,140 @@
+export const MEAL_TYPES = [
+  { value: 'BREAKFAST', label: 'Breakfast' },
+  { value: 'LUNCH', label: 'Lunch' },
+  { value: 'SNACK', label: 'Snack' },
+  { value: 'DINNER', label: 'Dinner' },
+];
+
+export const DAILY_TARGETS = Object.freeze({
+  calories: 1800,
+  proteinG: 135,
+});
+
+export const getDailyTargets = (user) => ({
+  calories: user?.dailyCalories ?? DAILY_TARGETS.calories,
+  proteinG: user?.dailyProtein ?? DAILY_TARGETS.proteinG,
+});
+
+export const normalizeMealName = (name) =>
+  String(name ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+
+/** Frequent meals first, then static staples, deduped by normalized name. */
+export function mergeMealRecommendations(frequent = [], staples = QUICK_STAPLES, limit = 12) {
+  const seen = new Set();
+  const merged = [];
+
+  for (const meal of [...frequent, ...staples]) {
+    const key = normalizeMealName(meal.name);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    merged.push(meal);
+    if (merged.length >= limit) break;
+  }
+
+  return merged;
+}
+
+export const QUICK_STAPLES = [
+  {
+    id: 'protein-oats',
+    name: 'Protein Oats + Milk + Whey + Seeds',
+    mealType: 'BREAKFAST',
+    calories: 650,
+    proteinG: 42,
+    carbsG: 55,
+    fatG: 25,
+  },
+  {
+    id: 'rice-sambar-curd',
+    name: 'Rice + Sambar + Curd',
+    mealType: 'LUNCH',
+    calories: 400,
+    proteinG: 13,
+    carbsG: 68,
+    fatG: 8,
+  },
+  {
+    id: 'chapati-dal-vegetables',
+    name: '3 Chapatis + Dal + Vegetables',
+    mealType: 'LUNCH',
+    calories: 550,
+    proteinG: 21,
+    carbsG: 85,
+    fatG: 14,
+  },
+  {
+    id: 'soya-chunks',
+    name: 'Soya Chunks 50g (Dry)',
+    mealType: 'SNACK',
+    calories: 175,
+    proteinG: 26,
+    carbsG: 17,
+    fatG: 1,
+  },
+  {
+    id: 'banana',
+    name: '1 Medium Banana',
+    mealType: 'SNACK',
+    calories: 105,
+    proteinG: 1,
+    carbsG: 27,
+    fatG: 0,
+  },
+  {
+    id: 'paneer',
+    name: 'Paneer 100g',
+    mealType: 'SNACK',
+    calories: 265,
+    proteinG: 18,
+    carbsG: 3,
+    fatG: 21,
+  },
+  {
+    id: 'curd',
+    name: 'Plain Curd 100g',
+    mealType: 'SNACK',
+    calories: 60,
+    proteinG: 3.5,
+    carbsG: 4,
+    fatG: 3,
+  },
+  {
+    id: 'chicken-rice',
+    name: 'Chicken Breast 150g + Cooked Rice 150g',
+    mealType: 'DINNER',
+    calories: 500,
+    proteinG: 51,
+    carbsG: 42,
+    fatG: 8,
+  },
+  {
+    id: 'rice-sambar-dinner',
+    name: 'Cooked Rice 200g + Sambar 200g',
+    mealType: 'DINNER',
+    calories: 390,
+    proteinG: 12,
+    carbsG: 76,
+    fatG: 5,
+  },
+  {
+    id: 'ragi-mudde-sambar',
+    name: 'Ragi Mudde 200g + Sambar 250g',
+    mealType: 'DINNER',
+    calories: 350,
+    proteinG: 10,
+    carbsG: 72,
+    fatG: 3,
+  },
+  {
+    id: 'bbq-chicken',
+    name: 'BBQ Chicken 200g (Edible Portion)',
+    mealType: 'DINNER',
+    calories: 400,
+    proteinG: 45,
+    carbsG: 8,
+    fatG: 20,
+  },
+];
